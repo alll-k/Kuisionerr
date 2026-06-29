@@ -16,7 +16,7 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
+
         if ($user->role->name === 'admin') {
             return redirect()->route('admin.dashboard');
         } else {
@@ -35,12 +35,12 @@ class DashboardController extends Controller
             $q->whereIn('name', ['dosen', 'mahasiswa']);
         })->count();
         $totalAnswers = UserAnswer::count();
-        
+
         $recentQuestionnaires = Questionnaire::with(['targetRole', 'questions', 'answers'])
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
-        
+
         return view('admin.dashboard', compact(
             'totalQuestionnaires',
             'activeQuestionnaires',
@@ -56,20 +56,18 @@ class DashboardController extends Controller
     public function respondentDashboard()
     {
         $user = Auth::user();
-        
-        $availableQuestionnaires = Questionnaire::where('target_role_id', $user->role_id)
-            ->where('status', 'active')
+
+        $availableQuestionnaires = Questionnaire::forRespondent($user->role_id)
             ->count();
-        
+
         $completedQuestionnaires = UserAnswer::where('user_id', $user->id)
             ->distinct('questionnaire_id')
             ->count();
-        
-        $activeQuestionnaires = Questionnaire::where('target_role_id', $user->role_id)
-            ->where('status', 'active')
+
+        $activeQuestionnaires = Questionnaire::forRespondent($user->role_id)
             ->with(['questions', 'answers'])
             ->get();
-        
+
         return view('respondent.dashboard', compact(
             'availableQuestionnaires',
             'completedQuestionnaires',
@@ -85,19 +83,19 @@ class DashboardController extends Controller
         $totalAnswers = UserAnswer::count();
         $uniqueRespondents = UserAnswer::distinct('user_id')->count();
         $totalQuestionnaires = Questionnaire::count();
-        
+
         $topQuestionnaires = Questionnaire::withCount('answers')
             ->orderBy('answers_count', 'desc')
             ->limit(5)
             ->get();
-        
+
         $topRespondents = User::withCount('answers')
             ->where('role_id', '!=', 1) // Exclude admin
             ->orderBy('answers_count', 'desc')
             ->limit(5)
             ->with('role')
             ->get();
-        
+
         return view('admin.analytics.index', compact(
             'totalAnswers',
             'uniqueRespondents',
@@ -114,19 +112,19 @@ class DashboardController extends Controller
     {
         $answers = UserAnswer::with(['user', 'question', 'questionnaire'])
             ->get();
-        
+
         $csv = "User,Email,Role,Kuesioner,Pertanyaan,Jawaban,Tanggal Menjawab\n";
-        
+
         foreach ($answers as $answer) {
-            $csv .= '"' . addslashes($answer->user->name) . '","' . 
-                    $answer->user->email . '","' . 
-                    $answer->user->role->name . '","' . 
-                    addslashes($answer->questionnaire->title) . '","' . 
-                    addslashes($answer->question->question_text) . '","' . 
-                    addslashes($answer->answer_text) . '","' . 
+            $csv .= '"' . addslashes($answer->user->name) . '","' .
+                    $answer->user->email . '","' .
+                    $answer->user->role->name . '","' .
+                    addslashes($answer->questionnaire->title) . '","' .
+                    addslashes($answer->question->question_text) . '","' .
+                    addslashes($answer->answer_text) . '","' .
                     $answer->answered_at . "\"\n";
         }
-        
+
         return response($csv)
             ->header('Content-Type', 'text/csv; charset=UTF-8')
             ->header('Content-Disposition', 'attachment; filename="export_kuesioner.csv"');

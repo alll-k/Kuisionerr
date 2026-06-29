@@ -20,16 +20,16 @@
             <div class="card-body">
                 <p class="text-muted">{{ $questionnaire->description }}</p>
                 <small class="text-muted d-block">
-                    <i class="fas fa-clipboard-list"></i> {{ $questionnaire->questions->count() }} Pertanyaan
+                    <i class="fas fa-clipboard-list"></i> {{ $questionnaire->questions ? $questionnaire->questions->count() : 0 }} Pertanyaan
                 </small>
             </div>
         </div>
-        
-        @if($questionnaire->questions->count() > 0)
+
+        @if($questionnaire->questions && $questionnaire->questions->count() > 0)
             <form action="{{ route('respondent.submit', $questionnaire) }}" method="POST" id="questionnaireForm">
                 @csrf
-                
-                @foreach($questionnaire->questions->sortBy('order') as $index => $question)
+
+                @foreach($questionnaire->questions ? $questionnaire->questions->sortBy('order') : collect() as $index => $question)
                     <div class="card mb-3">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-3">
@@ -38,19 +38,19 @@
                                     <span class="badge bg-info">{{ $question->sdgGoal->title }}</span>
                                 </h6>
                             </div>
-                            
+
                             <p class="card-text fw-bold mb-3">{{ $question->question_text }}</p>
-                            
-                            @if($question->question_type === 'multiple_choice' && $question->options)
+
+                            @if($question->question_type === 'multiple_choice' && $question->options && $question->options->count())
                                 <div class="question-options">
                                     @foreach($question->options as $option)
                                         <div class="form-check mb-2">
-                                            <input class="form-check-input" type="radio" 
-                                                   name="answers[{{ $question->id }}]" 
-                                                   id="option_{{ $question->id }}_{{ loop($loop->index) }}" 
-                                                   value="{{ $option }}" required>
-                                            <label class="form-check-label" for="option_{{ $question->id }}_{{ loop($loop->index) }}">
-                                                {{ $option }}
+                                            <input class="form-check-input" type="radio"
+                                                   name="answers[{{ $question->id }}]"
+                                                   id="option_{{ $question->id }}_{{ $loop->index }}"
+                                                   value="{{ $option->option_text }}" required>
+                                            <label class="form-check-label" for="option_{{ $question->id }}_{{ $loop->index }}">
+                                                {{ $option->option_text }}
                                             </label>
                                         </div>
                                     @endforeach
@@ -59,9 +59,9 @@
                                 <div class="scale-options">
                                     @for($i = 1; $i <= 5; $i++)
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" 
-                                                   name="answers[{{ $question->id }}]" 
-                                                   id="scale_{{ $question->id }}_{{ $i }}" 
+                                            <input class="form-check-input" type="radio"
+                                                   name="answers[{{ $question->id }}]"
+                                                   id="scale_{{ $question->id }}_{{ $i }}"
                                                    value="{{ $i }}" required>
                                             <label class="form-check-label" for="scale_{{ $question->id }}_{{ $i }}">
                                                 {{ $i }}
@@ -71,33 +71,33 @@
                                 </div>
                             @elseif($question->question_type === 'yes_no')
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="radio" 
-                                           name="answers[{{ $question->id }}]" 
-                                           id="yes_{{ $question->id }}" 
+                                    <input class="form-check-input" type="radio"
+                                           name="answers[{{ $question->id }}]"
+                                           id="yes_{{ $question->id }}"
                                            value="Ya" required>
                                     <label class="form-check-label" for="yes_{{ $question->id }}">
                                         Ya
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" 
-                                           name="answers[{{ $question->id }}]" 
-                                           id="no_{{ $question->id }}" 
+                                    <input class="form-check-input" type="radio"
+                                           name="answers[{{ $question->id }}]"
+                                           id="no_{{ $question->id }}"
                                            value="Tidak" required>
                                     <label class="form-check-label" for="no_{{ $question->id }}">
                                         Tidak
                                     </label>
                                 </div>
                             @else
-                                <textarea class="form-control" 
-                                          name="answers[{{ $question->id }}]" 
-                                          rows="3" required 
+                                <textarea class="form-control"
+                                          name="answers[{{ $question->id }}]"
+                                          rows="3" required
                                           placeholder="Tulis jawaban Anda di sini..."></textarea>
                             @endif
                         </div>
                     </div>
                 @endforeach
-                
+
                 <div class="card">
                     <div class="card-body">
                         <button type="submit" class="btn btn-primary btn-lg w-100">
@@ -115,7 +115,7 @@
             </div>
         @endif
     </div>
-    
+
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
@@ -132,14 +132,14 @@
                         <span class="badge bg-secondary">Ditutup</span>
                     @endif
                 </div>
-                
+
                 @if($questionnaire->start_date)
                     <div class="mb-3">
                         <small class="text-muted d-block">Tanggal Mulai</small>
                         {{ $questionnaire->start_date->format('d M Y H:i') }}
                     </div>
                 @endif
-                
+
                 @if($questionnaire->end_date)
                     <div class="mb-3">
                         <small class="text-muted d-block">Tanggal Berakhir</small>

@@ -8,10 +8,12 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('questionnaires', function (Blueprint $table) {
-            // Menambahkan status Draft, Published, atau Closed
-            $table->enum('status', ['draft', 'published', 'closed'])->default('draft')->after('description');
-        });
+        if (! Schema::hasColumn('questionnaires', 'status')) {
+            Schema::table('questionnaires', function (Blueprint $table) {
+                // Menambahkan status Draft, Published, atau Closed jika belum ada
+                $table->enum('status', ['draft', 'published', 'closed'])->default('draft');
+            });
+        }
     }
 
     public function down()

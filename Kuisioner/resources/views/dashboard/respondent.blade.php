@@ -25,7 +25,7 @@
                             <strong>Jumlah Pertanyaan:</strong> {{ $questionnaire->questions->count() }}
                         </p>
                         @if ($questionnaire->status === 'active')
-                            <a href="{{ route('questionnaires.show', $questionnaire) }}" class="btn btn-primary btn-sm">
+                            <a href="{{ route('respondent.show', $questionnaire) }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-pencil-alt"></i> {{ $completedQuestionnaires->contains($questionnaire->id) ? 'Lihat Kembali' : 'Mulai Menjawab' }}
                             </a>
                         @else

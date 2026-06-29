@@ -46,11 +46,11 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Daftar Pertanyaan ({{ $questionnaire->questions->count() }})</h5>
-                <a href="{{ route('admin.questions.create', ['questionnaire' => $questionnaire->id]) }}" class="btn btn-sm btn-primary">
+                <a href="{{ route('admin.questionnaires.questions.create', $questionnaire) }}" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus"></i> Tambah Pertanyaan
                 </a>
             </div>
@@ -71,7 +71,7 @@
                                 @foreach($questionnaire->questions->sortBy('order') as $index => $question)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ Str::limit($question->question_text, 60) }}</td>
+                                        <td>{{ \Illuminate\Support\Str::limit($question->question_text, 60) }}</td>
                                         <td>{{ $question->sdgGoal->title }}</td>
                                         <td><span class="badge bg-secondary">{{ $question->question_type }}</span></td>
                                         <td>
@@ -79,7 +79,7 @@
                                                 <a href="{{ route('admin.questions.edit', $question) }}" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <form action="{{ route('admin.questions.destroy', $question) }}" method="POST" style="display:inline;" 
+                                                <form action="{{ route('admin.questions.destroy', $question) }}" method="POST" style="display:inline;"
                                                       onsubmit="return confirm('Yakin ingin menghapus?')">
                                                     @csrf
                                                     @method('DELETE')
@@ -95,12 +95,12 @@
                         </table>
                     </div>
                 @else
-                    <p class="text-muted mb-0">Belum ada pertanyaan. <a href="{{ route('admin.questions.create', ['questionnaire' => $questionnaire->id]) }}">Tambah sekarang</a></p>
+                    <p class="text-muted mb-0">Belum ada pertanyaan. <a href="{{ route('admin.questionnaires.questions.create', $questionnaire) }}">Tambah sekarang</a></p>
                 @endif
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-4">
         <div class="card mb-3">
             <div class="card-body">
@@ -115,7 +115,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="card">
             <div class="card-body">
                 <h6 class="card-title">Aksi</h6>

@@ -30,13 +30,21 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard')->middleware('role:admin');
     Route::get('/analytics', [DashboardController::class, 'adminAnalytics'])->name('analytics')->middleware('role:admin');
     Route::get('/export', [DashboardController::class, 'export'])->name('export')->middleware('role:admin');
-    
+
     // Questionnaire Management
     Route::resource('questionnaires', QuestionnaireController::class)->middleware('role:admin');
-    
+
     // Question Management
-    Route::resource('questions', QuestionController::class)->middleware('role:admin');
-    Route::post('questionnaires/{questionnaire}/questions', [QuestionController::class, 'store'])->name('questions.store')->middleware('role:admin');
+    Route::resource('questions', QuestionController::class)
+        ->except(['create', 'store'])
+        ->middleware('role:admin');
+
+    Route::get('questionnaires/{questionnaire}/questions/create', [QuestionController::class, 'create'])
+        ->name('questionnaires.questions.create')
+        ->middleware('role:admin');
+    Route::post('questionnaires/{questionnaire}/questions', [QuestionController::class, 'store'])
+        ->name('questionnaires.questions.store')
+        ->middleware('role:admin');
 });
 
 // Respondent Routes

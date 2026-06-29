@@ -36,6 +36,7 @@ class QuestionnaireController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'target_role_id' => 'required|exists:roles,id',
+            'status' => 'required|in:draft,active,closed',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after:start_date',
         ]);
