@@ -16,9 +16,9 @@
             <div class="card-body">
                 <h5>Instruksi</h5>
                 <p>{{ $questionnaire->description }}</p>
-                
+
                 <hr>
-                
+
                 <form id="questionnaireForm">
                     @csrf
                     @forelse ($questions as $index => $question)
@@ -27,7 +27,7 @@
                                 <span class="badge bg-primary">{{ $index + 1 }}/{{ $questions->count() }}</span>
                                 {{ $question->question_text }}
                             </h6>
-                            
+
                             @if ($question->question_type === 'text')
                                 <textarea class="form-control answer-input" name="answers[{{ $question->id }}]" rows="3" data-question-id="{{ $question->id }}">{{ $userAnswers[$question->id] ?? '' }}</textarea>
                             @elseif ($question->question_type === 'yes_no')
@@ -49,8 +49,8 @@
                                     @endfor
                                 </div>
                             @elseif ($question->question_type === 'multiple_choice')
-                                @if ($question->options)
-                                    @foreach ($question->options as $option)
+                                @if ($question->questionOptions)
+                                    @foreach ($question->questionOptions as $option)
                                         <div class="form-check">
                                             <input class="form-check-input answer-input" type="radio" name="answers[{{ $question->id }}]" id="option_{{ $question->id }}_{{ $loop->index }}" value="{{ $option }}" data-question-id="{{ $question->id }}" {{ ($userAnswers[$question->id] ?? null) === $option ? 'checked' : '' }}>
                                             <label class="form-check-label" for="option_{{ $question->id }}_{{ $loop->index }}">{{ $option }}</label>
@@ -62,7 +62,7 @@
                     @empty
                         <div class="alert alert-info">Belum ada pertanyaan</div>
                     @endforelse
-                    
+
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Simpan
@@ -75,7 +75,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-4">
         <div class="card">
             <div class="card-header bg-light">
@@ -103,7 +103,7 @@ document.getElementById('questionnaireForm').addEventListener('submit', function
 function saveAnswers() {
     const formData = new FormData(document.getElementById('questionnaireForm'));
     const answers = Object.fromEntries(formData);
-    
+
     Object.entries(answers).forEach(([key, value]) => {
         if (key.startsWith('answers[')) {
             const questionId = key.match(/\[(\d+)\]/)[1];

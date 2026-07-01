@@ -31,8 +31,31 @@ class Question extends Model
     }
 
     // Relasi ke pilihan jawaban
-    public function options(): HasMany
+    public function questionOptions(): HasMany
     {
         return $this->hasMany(QuestionOption::class);
+    }
+
+    public function options(): HasMany
+    {
+        return $this->questionOptions();
+    }
+
+    public function getOptionsAttribute($value)
+    {
+        if ($this->relationLoaded('questionOptions')) {
+            return $this->getRelation('questionOptions');
+        }
+
+        if (!is_null($value)) {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                return collect($decoded)->map(function ($option) {
+                    return (object) ['option_text' => $option];
+                });
+            }
+        }
+
+        return $this->questionOptions;
     }
 }

@@ -41,9 +41,9 @@
 
                             <p class="card-text fw-bold mb-3">{{ $question->question_text }}</p>
 
-                            @if($question->question_type === 'multiple_choice' && $question->options && $question->options->count())
+                            @if(optional($question->questionOptions)->count() > 0)
                                 <div class="question-options">
-                                    @foreach($question->options as $option)
+                                    @foreach($question->questionOptions ?? [] as $option)
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="radio"
                                                    name="answers[{{ $question->id }}]"
@@ -54,6 +54,10 @@
                                             </label>
                                         </div>
                                     @endforeach
+                                </div>
+                            @elseif($question->question_type === 'multiple_choice')
+                                <div class="alert alert-warning">
+                                    Pilihan ganda belum memiliki opsi.
                                 </div>
                             @elseif($question->question_type === 'scale')
                                 <div class="scale-options">
